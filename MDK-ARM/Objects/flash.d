@@ -6,7 +6,7 @@
 .\objects\flash.o: ..\Libraries\CMSIS\Include\core_cmInstr.h
 .\objects\flash.o: ..\Libraries\CMSIS\Include\core_cmFunc.h
 .\objects\flash.o: ..\Libraries\CMSIS\Device\ST\STM32F0xx\Include\system_stm32f0xx.h
-.\objects\flash.o: ..\..\STM32F31_W8SET_CI_AND_MARK_IO_PWM\stm32f0xx_conf.h
+.\objects\flash.o: ..\..\STM32F31_W8Dual_IO_PWM\stm32f0xx_conf.h
 .\objects\flash.o: ..\Libraries\STM32F0xx_StdPeriph_Driver\inc\stm32f0xx_adc.h
 .\objects\flash.o: ..\Libraries\CMSIS\Device\ST\STM32F0xx\Include\stm32f0xx.h
 .\objects\flash.o: ..\Libraries\STM32F0xx_StdPeriph_Driver\inc\stm32f0xx_can.h

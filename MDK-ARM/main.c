@@ -117,7 +117,7 @@ void GPIO_PWMOUT_Config(void)
         GPIO_InitStructure.GPIO_Mode = GPIO_Mode_OUT; //NORMAL
         GPIO_InitStructure.GPIO_OType = GPIO_OType_PP;
         GPIO_InitStructure.GPIO_PuPd = GPIO_PuPd_UP;
-        GPIO_InitStructure.GPIO_Speed = GPIO_Speed_Level_3;
+        GPIO_InitStructure.GPIO_Speed = GPIO_Speed_50MHz;
         GPIO_Init(PWMX_GPIO_Port, &GPIO_InitStructure);
 	
 				GPIO_InitStructure.GPIO_Pin = PWMY_Pin;
@@ -278,7 +278,7 @@ void TIM1_PWM_Config(void)
 	
     gpio_init_structure.GPIO_Pin = PWMX_Pin;  
     gpio_init_structure.GPIO_Mode = GPIO_Mode_AF;                   //????(??)??  
-    gpio_init_structure.GPIO_Speed = GPIO_Speed_2MHz;              //Fast speed  
+    gpio_init_structure.GPIO_Speed = GPIO_Speed_50MHz;              //Fast speed  
     gpio_init_structure.GPIO_PuPd= GPIO_PuPd_NOPULL;                    //??  
     GPIO_Init(PWMX_GPIO_Port, &gpio_init_structure);
 		gpio_init_structure.GPIO_Pin = PWMY_Pin;  
@@ -320,9 +320,9 @@ void TIM1_PWM_Config(void)
 
 
 		/* Time ??????*/
-		timer_init_structure.TIM_Prescaler = 5;  //48/6=8 ,8M->0.125us
+		timer_init_structure.TIM_Prescaler = 1;  //24/6=8 ,8M->0.125us
 		timer_init_structure.TIM_CounterMode = TIM_CounterMode_Up;  /* Time ????????????*/
-		timer_init_structure.TIM_Period = 960;   // 960->120us  
+		timer_init_structure.TIM_Period = 720;   // 720->60us  
 		timer_init_structure.TIM_RepetitionCounter = 0;
 
 		TIM_TimeBaseInit(TIM1, &timer_init_structure);
@@ -348,9 +348,9 @@ void TIM1_PWM_Config(void)
 		TIM_OC3Init(TIM1, &timer_OCinit_structure);//????1??
 		TIM_OC3PreloadConfig(TIM1,TIM_OCPreload_Disable);
 
-//		TIM_ITConfig(TIM1, TIM_IT_Update, ENABLE);                      //使能TIM1中断
+		TIM_ITConfig(TIM1, TIM_IT_Update, ENABLE);                      //使能TIM1中断
 //		TIM_ITConfig(TIM1, TIM_IT_CC1, ENABLE);                      //使能TIM1中断
-//		TIM_ITConfig(TIM1, TIM_IT_CC2, ENABLE);                      //使能TIM1中断
+		TIM_ITConfig(TIM1, TIM_IT_CC2, ENABLE);                      //使能TIM1中断
 //		TIM_ITConfig(TIM1, TIM_IT_CC3, ENABLE);                      //使能TIM1中断
 
 		//TIM_ARRPreloadConfig(TIM1,DISABLE);
@@ -446,8 +446,8 @@ void TIM3_Config(void)
   
     timer_init_structure.TIM_ClockDivision = TIM_CKD_DIV1;          //系统时钟,不分频,24M  
     timer_init_structure.TIM_CounterMode = TIM_CounterMode_Up;      //向上计数模式  
-    timer_init_structure.TIM_Period = 1000;                          //每1000 uS触发一次中断,??ADC  
-    timer_init_structure.TIM_Prescaler = 47;                      //计数时钟分频,f=1M,systick=1 uS  
+    timer_init_structure.TIM_Period = 60000;                          //每1000 uS触发一次中断,??ADC  
+    timer_init_structure.TIM_Prescaler = 1;                      //计数时钟分频,f=1M,systick=1 uS  
     timer_init_structure.TIM_RepetitionCounter = 0x00;              //发生0+1的update事件产生中断 
 		
     TIM_TimeBaseInit(TIM3, &timer_init_structure);  
@@ -474,18 +474,20 @@ void TIM1_BRK_UP_TRG_COM_IRQHandler()
 			//_Gpio_7_set;
       TIM_ClearFlag(TIM1, TIM_FLAG_Update);     //清除update事件中断标志
     }
-		if(TIM_GetITStatus(TIM1, TIM_IT_CC1) != RESET)
-		{
-			TIM_ClearFlag(TIM1, TIM_IT_CC1 ); //清除update事件中断标志		
-		}
+//		if(TIM_GetITStatus(TIM1, TIM_IT_CC1) != RESET)
+//		{
+//			TIM_ClearFlag(TIM1, TIM_IT_CC1 ); //清除update事件中断标志		
+//		}
 		if(TIM_GetITStatus(TIM1, TIM_IT_CC2) != RESET)
 		{
+			ADC_StartOfConversion(ADC1);
+			//_Gpio_7_set;
 			TIM_ClearFlag(TIM1, TIM_FLAG_CC2);     //清除update事件中断标志
 		}
-		if(TIM_GetITStatus(TIM1, TIM_IT_CC3) != RESET)
-		{
-			TIM_ClearFlag(TIM1, TIM_FLAG_CC3);     //清除update事件中断标志
-		}
+//		if(TIM_GetITStatus(TIM1, TIM_IT_CC3) != RESET)
+//		{
+//			TIM_ClearFlag(TIM1, TIM_FLAG_CC3);     //清除update事件中断标志
+//		}
 } 
 
 
@@ -520,6 +522,7 @@ void DMA1_Channel1_IRQHandler()
     if(DMA_GetITStatus(DMA_IT_TC))                      //判断DMA传输完成中断  
     {   
 			selfADCValue[ADCIndex++] = 4095 - adc_dma_tab[0];
+			//_Gpio_7_set;
 			ADC_Conversion_Flag=1;
 //			if(ADCIndex>3)   //X,Y,Z三组，四个，==12个    /*需要采集完4组才计算？？？？，要480us*/
 //			{
@@ -544,7 +547,7 @@ void TIM14_IRQHandler()
 	  if(TIM_GetITStatus(TIM14, TIM_IT_Update))            //判断发生update事件中断  
     { 
 			scan_tick++;
-			_Gpio_7_set;
+			//_Gpio_7_set;
 			if(scan_tick>=10)  /*10*1.22=12.2ms*/
 			{
 				scan_tick = 0;
@@ -573,7 +576,7 @@ void TIM14_Config(void)
     timer_init_structure.TIM_ClockDivision = TIM_CKD_DIV1;          //系统时钟,不分频,24M  
     timer_init_structure.TIM_CounterMode = TIM_CounterMode_Up;      //向上计数模式  
     timer_init_structure.TIM_Period = 1000;                          //每300 uS触发一次中断,??ADC  
-    timer_init_structure.TIM_Prescaler = 47;                      //计数时钟分频,f=1M,systick=1 uS  
+    timer_init_structure.TIM_Prescaler = 23;                      //计数时钟分频,f=1M,systick=1 uS  
     timer_init_structure.TIM_RepetitionCounter = 0x00;              //发生0+1的update事件产生中断 
 		
     TIM_TimeBaseInit(TIM14, &timer_init_structure);  
@@ -639,9 +642,9 @@ void GPIO_DEINIT_ALL(void)
 
 void RCC_Configuration(void)
 {
-	RCC_PLLConfig(RCC_PLLSource_HSI,RCC_PLLMul_12);
+	RCC_PLLConfig(RCC_PLLSource_HSI,RCC_PLLMul_6);
 	RCC_PLLCmd(ENABLE);
-	RCC_ADCCLKConfig(RCC_ADCCLK_PCLK_Div4);
+	RCC_ADCCLKConfig(RCC_ADCCLK_PCLK_Div2);
 	while(RCC_GetFlagStatus(RCC_FLAG_PLLRDY)==RESET)
 	{
 		
@@ -773,6 +776,7 @@ void IWDG_Config(void)
 }
 
 /***************主函数***************/
+/*SYS Clokc 24MHz ADC clock 12MHz*/
 int main(void)
 {
 		uint32_t checkcouter;
@@ -784,8 +788,8 @@ int main(void)
 		IWDG_Config();
 		CheckFLag = FlashCheck();
 	
-		if(CheckFLag)
-		//if(1)
+		//if(CheckFLag)
+		if(1)
 		{
 			/*程序运行次数检测*/
 			ProgramCheck();

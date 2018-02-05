@@ -138,6 +138,7 @@ void DataProcess(void)
 			if(FB_Flag ==1)
 			{
 				CI_GetRegisterAState();
+				
 			}
 			else if(FB_Flag==0)
 			{
@@ -188,6 +189,8 @@ void SelfLearning(void)
 **********************/
 extern uint8_t ADC_Conversion_Flag;
 
+int16_t temptime= 0;
+
 void CI_PWM_OUT(void)
 {
 	TIM_SetCounter(MainTIMER,0X00);
@@ -195,29 +198,30 @@ void CI_PWM_OUT(void)
 	PWM1_ON;	
 	/*PWMX的ADC开始*/
 	PWMX_ON;
-	while(TIM_GetCounter(MainTIMER)<PWMx_HIGH);// 拉高PWMX 1us
+	//while(TIM_GetCounter(MainTIMER)<PWMx_HIGH);// 拉高PWMX 1us
+	//temptime = TIM_GetCounter(MainTIMER);
 	PWMX_OFF;
 	ADC_Conversion_Flag = 0;
 	ADC_StartOfConversion(ADC1);
 	while(ADC_Conversion_Flag==0);  //等待PWMX的ADC采集完成
 	ADC_Conversion_Flag = 0;
-	/*PWMX的ADC完成*/
-	PWMY_ON;
-	while(TIM_GetCounter(MainTIMER)<PWMy_HIGH);// 拉高PWMX 1us
-	PWMY_OFF;
-	ADC_Conversion_Flag = 0;
-	ADC_StartOfConversion(ADC1);
-	while(ADC_Conversion_Flag==0);  //等待PWMX的ADC采集完成
-	ADC_Conversion_Flag = 0;
-	/*PWMY的ADC完成*/
-	PWMZ_ON;
-	while(TIM_GetCounter(MainTIMER)<PWMz_HIGH);// 拉高PWMX 1us
-	PWMZ_OFF;
-	ADC_Conversion_Flag = 0;
-	ADC_StartOfConversion(ADC1);
-	while(ADC_Conversion_Flag==0);  //等待PWMX的ADC采集完成
-	ADC_Conversion_Flag = 0;
-	/*PWMY的ADC完成*/	
+//	/*PWMX的ADC完成*/
+//	PWMY_ON;
+//	while(TIM_GetCounter(MainTIMER)<PWMy_HIGH);// 拉高PWMX 1us
+//	PWMY_OFF;
+//	ADC_Conversion_Flag = 0;
+//	ADC_StartOfConversion(ADC1);
+//	while(ADC_Conversion_Flag==0);  //等待PWMX的ADC采集完成
+//	ADC_Conversion_Flag = 0;
+//	/*PWMY的ADC完成*/
+//	PWMZ_ON;
+//	while(TIM_GetCounter(MainTIMER)<PWMz_HIGH);// 拉高PWMX 1us
+//	PWMZ_OFF;
+//	ADC_Conversion_Flag = 0;
+//	ADC_StartOfConversion(ADC1);
+//	while(ADC_Conversion_Flag==0);  //等待PWMX的ADC采集完成
+//	ADC_Conversion_Flag = 0;
+//	/*PWMY的ADC完成*/	
 	PWM1_OFF;
 }
 
@@ -249,110 +253,110 @@ void CI_GetRegisterAState(void)
 	else if(CI_PWMx_y_z_TotalCounter>3)  //4组，12个数据完成
 		{
 			
-			ADCIndex = 0;
-			CI_PWMx_y_z_TotalCounter = 0;
-			CI_PWMx_y_z_Counter = 0;
-			
-			SX_RUN = (SX[0]+SX[1]+SX[2]+SX[3])/4; //累加求平均
-			SY_RUN = (SY[0]+SY[1]+SY[2]+SY[3])/4;
-			SZ_RUN = (SZ[0]+SZ[1]+SZ[2]+SZ[3])/4;
-		
-			S_RUN_TOTAL = SX_RUN+SY_RUN+SZ_RUN;
-			
-			CX = Algorithm_P*SX_RUN/S_RUN_TOTAL;   //1->SXA,2->SXB  2018-1-27 4096  //2018-1-28 8192
-			CY = Algorithm_P*SY_RUN/S_RUN_TOTAL;   //1->SXA,2->SXB
-			CZ = Algorithm_P*SZ_RUN/S_RUN_TOTAL;   //1->SXA,2->SXB
-			
-			if(S_RUN_TOTAL>SA_B[0])
-				NS_RUN = S_RUN_TOTAL - SA_B[0];  /*NSR_RUN = S-SA 绝对值*/
-			else
-				NS_RUN = SA_B[0] - S_RUN_TOTAL;
-			
-			if(CX>CXA_B[0])
-				CX_RUN =	CX - CXA_B[0];  /*CX_RUN=CX-CXB的绝对值*/
-			else
-				CX_RUN =	CXA_B[0] - CX;
-			
-			if(CY > CYA_B[0])
-				CY_RUN = 	CY - CYA_B[0];
-			else
-				CY_RUN = 	CYA_B[0] - CY;
-			
-			if(CZ > CZA_B[0] )
-				CZ_RUN = 	CZ - CZA_B[0]; 
-			else
-				CZ_RUN = 	CZA_B[0] - CZ; 
-			
-			NS_RUN = NS_RUN/4;     //2018-1-28 /2  2018-1-29
-			
-			//NXYZ_RUN = (CX_RUN+CY_RUN+CZ_RUN)*2; //2018-1-27  2018-1-29->3/2  ->*2
-			NXYZ_RUN = (CX_RUN+CY_RUN+CZ_RUN)*2;    //V23
-			//NXYZ_RUN = (CX_RUN+CY_RUN+CZ_RUN)*3/2;    //V21
-			/************SCI**********/
-			SCI = 1000 - (NS_RUN + NXYZ_RUN);  //2018-1-17  change
-			if(SCI<=0)
-				SCI = 0;
-			else if(SCI>=1000)
-				SCI  = 1000;
-			/************DX**********/
-			DX_Data[DX_Index] = SCI;
-			if(DX_Data[DX_Index]>DX_Max)
-				DX_Max = DX_Data[DX_Index];
-			if(DX_Data[DX_Index] < DX_Min)
-				DX_Min = DX_Data[DX_Index];
-			DX_Index++;
-			if(DX_Index>7)
-			{
-				DX_Index = 0;
-				DX = DX_Max - DX_Min;
-				DX_Max = 0;
-				DX_Min = 4095;
-			}
-			
-			/************DX2*************/
-			DX2_Data[DX2_Index] = SCI;
-			if(DX2_Data[DX2_Index]>DX2_Max)
-				DX2_Max = DX2_Data[DX2_Index];
-			if(DX2_Data[DX2_Index] < DX2_Min)
-				DX2_Min = DX2_Data[DX2_Index];
-			DX2_Index++;
-			if(DX2_Index>3)
-			{
-				DX2_Index = 0;
-				DX2 = DX2_Max - DX2_Min;
-				DX2_Max = 0;
-				DX2_Min = 4095;
-			}			
+//			ADCIndex = 0;
+//			CI_PWMx_y_z_TotalCounter = 0;
+//			CI_PWMx_y_z_Counter = 0;
+//			
+//			SX_RUN = (SX[0]+SX[1]+SX[2]+SX[3])/4; //累加求平均
+//			SY_RUN = (SY[0]+SY[1]+SY[2]+SY[3])/4;
+//			SZ_RUN = (SZ[0]+SZ[1]+SZ[2]+SZ[3])/4;
+//		
+//			S_RUN_TOTAL = SX_RUN+SY_RUN+SZ_RUN;
+//			
+//			CX = Algorithm_P*SX_RUN/S_RUN_TOTAL;   //1->SXA,2->SXB  2018-1-27 4096  //2018-1-28 8192
+//			CY = Algorithm_P*SY_RUN/S_RUN_TOTAL;   //1->SXA,2->SXB
+//			CZ = Algorithm_P*SZ_RUN/S_RUN_TOTAL;   //1->SXA,2->SXB
+//			
+//			if(S_RUN_TOTAL>SA_B[0])
+//				NS_RUN = S_RUN_TOTAL - SA_B[0];  /*NSR_RUN = S-SA 绝对值*/
+//			else
+//				NS_RUN = SA_B[0] - S_RUN_TOTAL;
+//			
+//			if(CX>CXA_B[0])
+//				CX_RUN =	CX - CXA_B[0];  /*CX_RUN=CX-CXB的绝对值*/
+//			else
+//				CX_RUN =	CXA_B[0] - CX;
+//			
+//			if(CY > CYA_B[0])
+//				CY_RUN = 	CY - CYA_B[0];
+//			else
+//				CY_RUN = 	CYA_B[0] - CY;
+//			
+//			if(CZ > CZA_B[0] )
+//				CZ_RUN = 	CZ - CZA_B[0]; 
+//			else
+//				CZ_RUN = 	CZA_B[0] - CZ; 
+//			
+//			NS_RUN = NS_RUN/4;     //2018-1-28 /2  2018-1-29
+//			
+//			//NXYZ_RUN = (CX_RUN+CY_RUN+CZ_RUN)*2; //2018-1-27  2018-1-29->3/2  ->*2
+//			NXYZ_RUN = (CX_RUN+CY_RUN+CZ_RUN)*2;    //V23
+//			//NXYZ_RUN = (CX_RUN+CY_RUN+CZ_RUN)*3/2;    //V21
+//			/************SCI**********/
+//			SCI = 1000 - (NS_RUN + NXYZ_RUN);  //2018-1-17  change
+//			if(SCI<=0)
+//				SCI = 0;
+//			else if(SCI>=1000)
+//				SCI  = 1000;
+//			/************DX**********/
+//			DX_Data[DX_Index] = SCI;
+//			if(DX_Data[DX_Index]>DX_Max)
+//				DX_Max = DX_Data[DX_Index];
+//			if(DX_Data[DX_Index] < DX_Min)
+//				DX_Min = DX_Data[DX_Index];
+//			DX_Index++;
+//			if(DX_Index>7)
+//			{
+//				DX_Index = 0;
+//				DX = DX_Max - DX_Min;
+//				DX_Max = 0;
+//				DX_Min = 4095;
+//			}
+//			
+//			/************DX2*************/
+//			DX2_Data[DX2_Index] = SCI;
+//			if(DX2_Data[DX2_Index]>DX2_Max)
+//				DX2_Max = DX2_Data[DX2_Index];
+//			if(DX2_Data[DX2_Index] < DX2_Min)
+//				DX2_Min = DX2_Data[DX2_Index];
+//			DX2_Index++;
+//			if(DX2_Index>3)
+//			{
+//				DX2_Index = 0;
+//				DX2 = DX2_Max - DX2_Min;
+//				DX2_Max = 0;
+//				DX2_Min = 4095;
+//			}			
 
-			/***********RegisterA***********/
-			
-			SCI_Max = CICurrentThreshold + 0.25*DX; //2018-1-27
-			SCI_Min = CICurrentThreshold - DX - 80;    //2018-1-28 50  2018-1-29-80
-			
-			if(SCI_Min<10)
-				 SCI_Min= 10;
-			
-			/*判断SCI的范围，并输出RegisterA的值*/
-			if(SCI >= SCI_Max)
-			{
-				RegisterA_0Counter = 0;
-				RegisterA_1Counter++;
-				if(RegisterA_1Counter>=4)
-				{
-					RegisterA_1Counter = 0;
-					RegisterA = 1;
-				}
-			}
-			else if(SCI <= SCI_Min)
-			{
-				RegisterA_1Counter = 0;
-				RegisterA_0Counter++;
-				if(RegisterA_0Counter>=4)
-				{
-					RegisterA_0Counter = 0;
-					RegisterA = 0;
-				}
-			}
+//			/***********RegisterA***********/
+//			
+//			SCI_Max = CICurrentThreshold + 0.25*DX; //2018-1-27
+//			SCI_Min = CICurrentThreshold - DX - 80;    //2018-1-28 50  2018-1-29-80
+//			
+//			if(SCI_Min<10)
+//				 SCI_Min= 10;
+//			
+//			/*判断SCI的范围，并输出RegisterA的值*/
+//			if(SCI >= SCI_Max)
+//			{
+//				RegisterA_0Counter = 0;
+//				RegisterA_1Counter++;
+//				if(RegisterA_1Counter>=4)
+//				{
+//					RegisterA_1Counter = 0;
+//					RegisterA = 1;
+//				}
+//			}
+//			else if(SCI <= SCI_Min)
+//			{
+//				RegisterA_1Counter = 0;
+//				RegisterA_0Counter++;
+//				if(RegisterA_0Counter>=4)
+//				{
+//					RegisterA_0Counter = 0;
+//					RegisterA = 0;
+//				}
+//			}
 			IWDG_ReloadCounter();//看门狗喂狗
 			SET_GOODBAD();
 			FB_Flag = Get_FB_Flag();
@@ -685,8 +689,8 @@ void MARK_GetRegisterAState(void)
 uint8_t Get_FB_Flag(void)
 {
 	uint8_t FB ;
-	FB =  GPIO_ReadInputDataBit(FB_GPIO_Port,FB_Pin);
-	//FB = 1; //debug
+	//FB =  GPIO_ReadInputDataBit(FB_GPIO_Port,FB_Pin);
+	FB = 1; //debug
 	return FB;
 
 	

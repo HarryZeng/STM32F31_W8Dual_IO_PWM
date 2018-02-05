@@ -334,7 +334,7 @@
               <MiscControls></MiscControls>
               <Define>USE_STDPERIPH_DRIVER,STM32F0XX_LD</Define>
               <Undefine></Undefine>
-              <IncludePath>..\Libraries\CMSIS\Device\ST\STM32F0xx\Include;..\Libraries\CMSIS\Device\ST\STM32F0xx\Source\Templates\arm;..\Libraries\CMSIS\Device\ST\STM32F0xx\Source\Templates;..\Libraries\STM32F0xx_StdPeriph_Driver\inc;..\Libraries\STM32F0xx_StdPeriph_Driver\src;..\..\STM32F0xx_StdPeriph_Templates;..\Libraries\CMSIS\Include;..\..\STM32F31_W8SET_CI_AND_MARK_IO_PWM</IncludePath>
+              <IncludePath>..\Libraries\CMSIS\Device\ST\STM32F0xx\Include;..\Libraries\CMSIS\Device\ST\STM32F0xx\Source\Templates\arm;..\Libraries\CMSIS\Device\ST\STM32F0xx\Source\Templates;..\Libraries\STM32F0xx_StdPeriph_Driver\inc;..\Libraries\STM32F0xx_StdPeriph_Driver\src;..\..\STM32F0xx_StdPeriph_Templates;..\Libraries\CMSIS\Include;..\MDK-ARM;..\..\STM32F31_W8Dual_IO_PWM</IncludePath>
             </VariousControls>
           </Cads>
           <Aads>
