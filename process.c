@@ -191,37 +191,80 @@ extern uint8_t ADC_Conversion_Flag;
 
 int16_t temptime= 0;
 
+void delay_us(uint32_t i)
+ {
+     uint32_t temp;
+     SysTick->LOAD=i;         //设置重装载值, 72MHZ?
+     //SysTick->CTRL=0X01;         //使能，使用外部晶振,???????
+     SysTick->VAL=0;                //计数器清零
+     do
+     {
+         temp=SysTick->CTRL;           //读取当前值
+     }
+     while((temp&0x01)&&(!(temp&(1<<16))));     //等待时间到达
+     SysTick->CTRL=0;    //关闭计数器
+     SysTick->VAL=0;        //清空计数器
+ }
+
+
+ void PWM_LowUs_Set(void)  //1.24us
+ {
+		/*拉高*/
+		GPIOA->BSRR = 0x200;
+		GPIOA->BSRR = 0x200;
+		GPIOA->BSRR = 0x200;
+		GPIOA->BSRR = 0x200;
+		GPIOA->BSRR = 0x200;
+		GPIOA->BSRR = 0x200;
+		GPIOA->BSRR = 0x200;
+		GPIOA->BSRR = 0x200;
+		GPIOA->BSRR = 0x200;
+		GPIOA->BSRR = 0x200;
+		GPIOA->BSRR = 0x200;
+		GPIOA->BSRR = 0x200;
+		GPIOA->BSRR = 0x200;
+		GPIOA->BSRR = 0x200;
+		/*拉低*/
+		GPIOA->BRR = 0x200;
+ }
+ 
+
+void PWM_HighUs_Set(void)  //1.49us
+ {
+		/*拉高*/
+		GPIOA->BSRR = 0x200;
+		GPIOA->BSRR = 0x200;
+		GPIOA->BSRR = 0x200;
+		GPIOA->BSRR = 0x200;
+		GPIOA->BSRR = 0x200;
+		GPIOA->BSRR = 0x200;
+		GPIOA->BSRR = 0x200;
+		GPIOA->BSRR = 0x200;
+		GPIOA->BSRR = 0x200;
+		GPIOA->BSRR = 0x200;
+		GPIOA->BSRR = 0x200;
+		GPIOA->BSRR = 0x200;
+		GPIOA->BSRR = 0x200;
+		GPIOA->BSRR = 0x200;
+		GPIOA->BSRR = 0x200;
+		GPIOA->BSRR = 0x200;
+		GPIOA->BSRR = 0x200;
+		/*拉低*/
+		GPIOA->BRR = 0x200;
+ }
+ 
 void CI_PWM_OUT(void)
 {
 	TIM_SetCounter(MainTIMER,0X00);
 	while(TIM_GetCounter(MainTIMER)<PWM_C_Start);// 开始拉高PWM
 	PWM1_ON;	
-	/*PWMX的ADC开始*/
-	PWMX_ON;
-	//while(TIM_GetCounter(MainTIMER)<PWMx_HIGH);// 拉高PWMX 1us
-	//temptime = TIM_GetCounter(MainTIMER);
-	PWMX_OFF;
+
+	PWM_HighUs_Set();
 	ADC_Conversion_Flag = 0;
 	ADC_StartOfConversion(ADC1);
 	while(ADC_Conversion_Flag==0);  //等待PWMX的ADC采集完成
 	ADC_Conversion_Flag = 0;
-//	/*PWMX的ADC完成*/
-//	PWMY_ON;
-//	while(TIM_GetCounter(MainTIMER)<PWMy_HIGH);// 拉高PWMX 1us
-//	PWMY_OFF;
-//	ADC_Conversion_Flag = 0;
-//	ADC_StartOfConversion(ADC1);
-//	while(ADC_Conversion_Flag==0);  //等待PWMX的ADC采集完成
-//	ADC_Conversion_Flag = 0;
-//	/*PWMY的ADC完成*/
-//	PWMZ_ON;
-//	while(TIM_GetCounter(MainTIMER)<PWMz_HIGH);// 拉高PWMX 1us
-//	PWMZ_OFF;
-//	ADC_Conversion_Flag = 0;
-//	ADC_StartOfConversion(ADC1);
-//	while(ADC_Conversion_Flag==0);  //等待PWMX的ADC采集完成
-//	ADC_Conversion_Flag = 0;
-//	/*PWMY的ADC完成*/	
+	
 	PWM1_OFF;
 }
 
