@@ -24,24 +24,24 @@
 /* Includes ------------------------------------------------------------------*/
 #include  "stm32f0xx.h"
 
-#define ADC_IN_Pin 				GPIO_Pin_0
-#define ADC_IN_GPIO_Port 	GPIOA
-#define PWM1_Pin 					GPIO_Pin_2
-#define PWM1_GPIO_Port 		GPIOA
-#define GOODBAD_Pin 			GPIO_Pin_3
-#define GOODBAD_GPIO_Port GPIOA
-#define SET_Pin 					GPIO_Pin_4
-#define SET_GPIO_Port 		GPIOA
-#define PWMX_Pin 					GPIO_Pin_8
-#define PWMX_GPIO_Port		GPIOA
-#define PWMY_Pin 					GPIO_Pin_9
-#define PWMY_GPIO_Port 		GPIOA
-#define PWMZ_Pin 					GPIO_Pin_10
-#define PWMZ_GPIO_Port 		GPIOA
-#define FB_Pin 						GPIO_Pin_11
-#define FB_GPIO_Port 			GPIOA
-#define OUT_Pin 					GPIO_Pin_12
-#define OUT_GPIO_Port 		GPIOA	 
+#define ADC_IN_Pin 					GPIO_Pin_0
+#define ADC_IN_GPIO_Port 		GPIOA
+#define PWM1_Pin 						GPIO_Pin_2
+#define PWM1_GPIO_Port 			GPIOA
+#define PIN6_3157_Pin 			GPIO_Pin_3
+#define PIN6_3157_GPIO_Port GPIOA
+#define KG_Pin 						GPIO_Pin_4
+#define KG_GPIO_Port 			GPIOA
+#define PWMX_Pin 						GPIO_Pin_8
+#define PWMX_GPIO_Port			GPIOA
+#define PWMY_Pin 						GPIO_Pin_9
+#define PWMY_GPIO_Port 			GPIOA
+#define PWMZ_Pin 						GPIO_Pin_10
+#define PWMZ_GPIO_Port 			GPIOA
+#define INT_Pin 						GPIO_Pin_1
+#define INT_GPIO_Port 			GPIOA
+#define OUT_Pin 						GPIO_Pin_11
+#define OUT_GPIO_Port 			GPIOA	
 	 
 #define Algorithm_P				4096	 
 	 
@@ -63,7 +63,7 @@
 
 
 /*PWM通道状态控制 宏定义*/
-
+/*W8SET的PWMX,PWMY,PWMZ,PWM1的输出*/
 #define PWM1_ON  	GPIO_WriteBit(PWM1_GPIO_Port, PWM1_Pin, Bit_SET)
 #define PWM1_OFF  GPIO_WriteBit(PWM1_GPIO_Port, PWM1_Pin, Bit_RESET)
 
@@ -76,17 +76,11 @@
 #define PWMZ_ON  	GPIO_WriteBit(PWMZ_GPIO_Port, PWMZ_Pin, Bit_SET)
 #define PWMZ_OFF  GPIO_WriteBit(PWMZ_GPIO_Port, PWMZ_Pin, Bit_RESET)
 
-//#define PWM1_ON  	GPIO_WriteBit(PWM1_GPIO_Port, PWM1_Pin, Bit_SET)
-//#define PWM1_OFF  GPIO_WriteBit(PWM1_GPIO_Port, PWM1_Pin, Bit_RESET)
+/*W8--Dual的PWM输出*/
+#define PWMY_ON  	GPIOA->ODR = GPIOA->ODR | 0x0080  
+#define PWMY_OFF  GPIOA->ODR = GPIOA->ODR & 0xFF7F 
 
-//#define PWMX_ON  	GPIOA->ODR = GPIOA->ODR | 0x0080
-//#define PWMX_OFF  GPIOA->ODR = GPIOA->ODR & 0xFF7F
 
-#define PWMY_ON  	GPIOA->ODR = GPIOA->ODR | 0x0080  //GPIOA->ODR = GPIOA->ODR | 0x0100
-#define PWMY_OFF  GPIOA->ODR = GPIOA->ODR & 0xFF7F  //GPIOA->ODR = GPIOA->ODR & 0xFEFF
-
-//#define PWMZ_ON  	GPIO_WriteBit(PWMZ_GPIO_Port, PWMZ_Pin, Bit_SET)
-//#define PWMZ_OFF  GPIO_WriteBit(PWMZ_GPIO_Port, PWMZ_Pin, Bit_RESET)
 
 #define MainTIMER  TIM3
 

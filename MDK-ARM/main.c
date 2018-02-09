@@ -515,7 +515,7 @@ extern uint8_t SelfGetADCWell;
 extern uint8_t FB_Flag;
 uint8_t ADCIndex=0;
 uint8_t DMAIndex=0;
-int16_t selfADCValue[12];
+int16_t selfADCValue[2];
 uint8_t ADC_Conversion_Flag=0;
 void DMA1_Channel1_IRQHandler()  
 {  
@@ -601,23 +601,36 @@ void GPIO_INIT(void)
     gpio_init_structure.GPIO_PuPd= GPIO_PuPd_NOPULL;                    //??  
     GPIO_Init(OUT_GPIO_Port, &gpio_init_structure);  
 	
-		gpio_init_structure.GPIO_Pin = FB_Pin;
+	  gpio_init_structure.GPIO_Pin = PIN6_3157_Pin;  
+    gpio_init_structure.GPIO_Mode = GPIO_Mode_OUT;                   //????(??)??  
+    gpio_init_structure.GPIO_OType = GPIO_OType_PP;                 //????  
+    gpio_init_structure.GPIO_Speed = GPIO_Speed_2MHz;              //Fast speed  
+    gpio_init_structure.GPIO_PuPd= GPIO_PuPd_NOPULL;                    //??  
+    GPIO_Init(PIN6_3157_GPIO_Port, &gpio_init_structure);  
+	
+		gpio_init_structure.GPIO_Pin = INT_Pin;
 		gpio_init_structure.GPIO_Mode = GPIO_Mode_IN;                   //????(??)??  
     gpio_init_structure.GPIO_Speed = GPIO_Speed_2MHz;              //Fast speed  
-		gpio_init_structure.GPIO_PuPd= GPIO_PuPd_DOWN;                    //??
-    GPIO_Init(FB_GPIO_Port, &gpio_init_structure);  
+		gpio_init_structure.GPIO_PuPd= GPIO_PuPd_UP;                    //??
+    GPIO_Init(INT_GPIO_Port, &gpio_init_structure);  
 	
-		gpio_init_structure.GPIO_Pin = GOODBAD_Pin;
-		gpio_init_structure.GPIO_Mode = GPIO_Mode_OUT;                   //????(??)??  
-    gpio_init_structure.GPIO_Speed = GPIO_Speed_2MHz;              //Fast speed  
-		gpio_init_structure.GPIO_PuPd= GPIO_PuPd_DOWN;                    //??
-    GPIO_Init(GOODBAD_GPIO_Port, &gpio_init_structure);  
-	
-		gpio_init_structure.GPIO_Pin = SET_Pin;
+		gpio_init_structure.GPIO_Pin = KG_Pin;
 		gpio_init_structure.GPIO_Mode = GPIO_Mode_IN;                   //????(??)??  
     gpio_init_structure.GPIO_Speed = GPIO_Speed_2MHz;              //Fast speed  
-		gpio_init_structure.GPIO_PuPd= GPIO_PuPd_DOWN;                    //??
-    GPIO_Init(SET_GPIO_Port, &gpio_init_structure);  
+		gpio_init_structure.GPIO_PuPd= GPIO_PuPd_UP;                    //??
+    GPIO_Init(KG_GPIO_Port, &gpio_init_structure);  
+	
+//		gpio_init_structure.GPIO_Pin = GOODBAD_Pin;
+//		gpio_init_structure.GPIO_Mode = GPIO_Mode_OUT;                   //????(??)??  
+//    gpio_init_structure.GPIO_Speed = GPIO_Speed_2MHz;              //Fast speed  
+//		gpio_init_structure.GPIO_PuPd= GPIO_PuPd_DOWN;                    //??
+//    GPIO_Init(GOODBAD_GPIO_Port, &gpio_init_structure);  
+	
+//		gpio_init_structure.GPIO_Pin = SET_Pin;
+//		gpio_init_structure.GPIO_Mode = GPIO_Mode_IN;                   //????(??)??  
+//    gpio_init_structure.GPIO_Speed = GPIO_Speed_2MHz;              //Fast speed  
+//		gpio_init_structure.GPIO_PuPd= GPIO_PuPd_DOWN;                    //??
+//    GPIO_Init(SET_GPIO_Port, &gpio_init_structure);  
 
 }
 
